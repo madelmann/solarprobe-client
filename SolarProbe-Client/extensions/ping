@@ -1,0 +1,44 @@
+#!/usr/bin/env slang
+
+import libParam;
+import FileReader.Scanner;
+import System.String;
+
+
+private string COLOR;
+private string DATE;
+private string MSG_SHORT;
+private string PROBE const = "ping";
+
+private int COUNT const = 1;
+private int TTL const = 43;
+
+
+public void Main( int argc, string args )
+{
+    var params = new ParameterHandler( argc, args, false );
+
+    COLOR = process( new String( new Scanner( params.directoryName() + "/ping.hosts" ).getText() ) );
+    DATE  = strftime( "%Y-%m-%d %H:%M:%S %Z" );
+
+    print( streval( "{{{PROBE}}} {{{COLOR}}} {{{DATE}}} {{{MSG_SHORT}}}" ) );
+}
+
+private string process( String config )
+{
+    foreach ( string host : config.SplitBy( LINEBREAK ) ) {
+        if ( !host ) {
+            continue;
+        }
+
+        var result = cast<int>( system( streval( "ping -c {{{COUNT}}} -t {{{TTL}}} {{{host}}} 2> /dev/null; echo $?" ) ) );
+        if ( result ) {
+            MSG_SHORT = streval( "ERROR: HOST '{{{host}}}' not reachable" );
+            return "red";
+        }
+    }
+
+    MSG_SHORT = "OK: all configured hosts are reachable withing limits";
+    return "green";
+}
+

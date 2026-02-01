@@ -1,0 +1,56 @@
+#!/bin/bash
+
+SCRIPT_DIRECTORY=$(dirname "$0")
+source "${SCRIPT_DIRECTORY}/disk.conf"
+
+# Probe - Configuration
+
+PROBE=disk     # Name of the probe
+COLOR=green    # By default, everything is OK
+MSG_LONG=""
+MSG_SHORT=""
+
+# Probe - Implementation
+
+MSG_LONG=$(df -P -T | tail -n +2)
+STATUS=0
+
+# Use input redirection instead of a pipe
+while read -r FS TYPE SIZE USED AVAIL USEP MOUNT; do
+    echo "$TYPE" | grep -Eq "$IGNORE_FS" && continue
+
+    USE=${USEP%\%}
+
+    if [ "$USE" -ge "$CRITICAL" ]; then
+        #echo "CRITICAL: $MOUNT is at ${USE}% usage"
+        STATUS=2
+    elif [ "$USE" -ge "$WARNING" ] && [ "$STATUS" -lt 2 ]; then
+        #echo "WARNING:  $MOUNT is at ${USE}% usage"
+        STATUS=1
+    fi
+done <<EOF
+echo -e "$MSG_LONG"
+EOF
+
+case "$STATUS" in
+    0)
+        COLOR=green
+        MSG_SHORT="OK: All partitions are below ${WARNING}% usage"
+        ;;
+    1)
+        COLOR=yellow
+        MSG_SHORT="WARNING: One or more partitions exceed ${WARNING}% usage"
+        ;;
+    2)
+        COLOR=red
+        MSG_SHORT="CRITICAL: One or more partitions exceed ${CRITICAL}% usage"
+        ;;
+esac
+
+# Probe - Result
+
+#printf '%s %s\n' "$PROBE $COLOR $(date)" "$MSG_SHORT\n$MSG_LONG"
+printf '%s %s\n' "$PROBE $COLOR $(date)" "$MSG_SHORT"
+
+exit 0
+

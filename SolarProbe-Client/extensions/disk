@@ -1,0 +1,58 @@
+#!/usr/bin/env slang
+
+import libParam;
+import libScript.Files;
+
+
+private int ERROR const   = 90;
+private int WARNING const = 75;
+
+private string COLOR;
+private string DATE;
+private string MSG_SHORT;
+private string PROBE const = "disk";
+
+
+public void Main( int argc, string args )
+{
+    COLOR = process();
+    DATE  = strftime( "%Y-%m-%d %H:%M:%S %Z" );
+
+    print( streval( "{{{PROBE}}} {{{COLOR}}} {{{DATE}}} {{{MSG_SHORT}}}" ) );
+}
+
+private string process()
+{
+    var result = Files.df( "-P -T | tail -n +2" );
+
+    int highestUsage;
+
+    foreach ( Line line : result ) {
+        var partition = line[ 6 ];
+        var usage     = cast<int>( line[ 5 ] );
+
+        // print( streval( "Partition {{{partition}}} is {{{usage}}}% full" ) );
+
+        if ( usage >= ERROR ) {
+            highestUsage = ERROR;
+        }
+        else if ( usage >= WARNING && highestUsage < WARNING ) {
+            highestUsage = WARNING;
+        }
+    }
+
+    switch ( true ) {
+        case ( highestUsage >= ERROR ): {
+            MSG_SHORT = streval( "ERROR: {{{ERROR}}}% or less of memory free" );
+            return "red";
+        }
+        case ( highestUsage >= WARNING ): {
+            MSG_SHORT = streval( "WARNING: {{{WARNING}}}% or less of memory free" );
+            return "yellow";
+        }
+    }
+
+    MSG_SHORT = streval( "OK: no partition exceeds {{{WARNING}}}% of disk usage" );
+    return "green";
+}
+

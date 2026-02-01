@@ -1,0 +1,32 @@
+#!/bin/bash
+
+SCRIPT_DIRECTORY=$(dirname "$0")
+source "${SCRIPT_DIRECTORY}/ping.conf"
+
+# Probe - Configuration
+
+PROBE=ping     # Name of the probe
+COLOR=green    # By default, everything is OK
+MSG_LONG=""
+MSG_SHORT=""
+
+# Probe - Implementation
+
+while read -r HOST; do
+    RESULT=$(ping -c ${COUNT} -t ${TTL} "${HOST}" > /dev/null; echo $?)
+
+    if [ "$RESULT" -eq 1 ]; then
+        COLOR=red
+        MSG_SHORT="${MSG_SHORT} $HOST is unreachable"
+    fi
+done <<EOF
+$(cat "${SCRIPT_DIRECTORY}/ping.hosts")
+EOF
+
+# Probe - Result
+
+#printf '%s %s\n' "$PROBE $COLOR $(date)" "$MSG_SHORT\n$MSG_LONG"
+printf '%s %s\n' "$PROBE $COLOR $(date)" "$MSG_SHORT"
+
+exit 0
+

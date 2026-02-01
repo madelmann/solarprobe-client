@@ -1,0 +1,41 @@
+#!/usr/bin/env slang
+
+import libParam;
+import FileReader.Scanner;
+import System.String;
+
+
+private string COLOR;
+private string DATE;
+private string MSG_SHORT;
+private string PROBE const = "http";
+
+
+public void Main( int argc, string args )
+{
+    var params = new ParameterHandler( argc, args, false );
+
+    COLOR = process( new String( new Scanner( params.directoryName() + "/http.hosts" ).getText() ) );
+    DATE  = strftime( "%Y-%m-%d %H:%M:%S %Z" );
+
+    print( streval( "{{{PROBE}}} {{{COLOR}}} {{{DATE}}} {{{MSG_SHORT}}}" ) );
+}
+
+private string process( String config )
+{
+    foreach ( string url : config.SplitBy( LINEBREAK ) ) {
+        if ( !url ) {
+            continue;
+        }
+
+        var result = system( streval( "curl -s -I \"{{{url}}}\" | grep HTTP | grep 200" ) );
+        if ( !result ) {
+            MSG_SHORT = streval( "ERROR: URL '{{{url}}}' not reachable" );
+            return "red";
+        }
+    }
+
+    MSG_SHORT = "OK: all configured hosts are reachable withing limits";
+    return "green";
+}
+

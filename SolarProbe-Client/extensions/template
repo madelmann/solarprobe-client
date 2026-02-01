@@ -1,0 +1,27 @@
+#!/usr/bin/env slang
+
+// put your imports here
+
+
+private string COLOR;
+private string DATE;
+private string MSG_SHORT;
+private string PROBE const = "template";
+
+
+public void Main( int argc, string args )
+{
+    COLOR = process();
+    DATE  = strftime( "%Y-%m-%d %H:%M:%S %Z" );
+
+    print( streval( "{{{PROBE}}} {{{COLOR}}} {{{DATE}}} {{{MSG_SHORT}}}" ) );
+}
+
+private string process()
+{
+    // TODO: implement your check here
+
+    MSG_SHORT = "OK";
+    return "green";
+}
+
