@@ -9,7 +9,7 @@ PROBES_CONF="${CLIENT_DIRECTORY}/probes.conf"
 
 while read -r probe; do
 
-  if [ -n "${EXTENSION_DIRECTORY}/${probe}" ]; then
+  if [ -f "${EXTENSION_DIRECTORY}/${probe}" ]; then
 
     echo "Probing $probe..."
 
