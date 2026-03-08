@@ -1,6 +1,6 @@
 #!/bin/sh
 # Wrapper to send Xymon extension output to probe server
-# Usage: xymon-post.sh <hostname> <probe-server-url> [extension ... args]
+# Usage: post.sh <hostname> <probe-server-url> [extension ... args]
 
 #set -eu
 
