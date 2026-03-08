@@ -1,11 +1,11 @@
 {
   "name": "SolarProbe virtual module",
   "name_short": "SolarProbe",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Virtual module for SolarProbe client & server. Solarprobe is a monitoring tool which probes your servers and services and forwards the collected data to your SolarProbe server.",
   "dependencies": [
-    { "module": "SolarProbe-Client", "version_min": "0.1.0" },
-    { "module": "SolarProbe-Server", "version_min": "0.1.0" }
+    { "module": "SolarProbe-Client", "version_min": "0.1.1" },
+    { "module": "SolarProbe-Server", "version_min": "0.1.1" }
   ],
   "target": {
     "directory": "SolarProbe",
