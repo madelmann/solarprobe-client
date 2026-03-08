@@ -1,0 +1,48 @@
+#!/usr/bin/env slang
+
+import libScript.OS;
+
+
+private int ERROR const   = 0;
+private int WARNING const = 5;
+
+private string COLOR;
+private string DATE;
+private string MSG_SHORT;
+private string PROBE const = "uptime";
+
+
+public void Main( int, string )
+{
+    COLOR = process();
+    DATE  = strftime( "%Y-%m-%d %H:%M:%S %Z" );
+
+    print( streval( "{{{PROBE}}} {{{COLOR}}} {{{DATE}}} {{{MSG_SHORT}}}" ) );
+}
+
+private string process()
+{
+    var result = OS.uptime();
+
+    var output const = result[ 0 ];
+
+    var days = 0;
+    if ( output[ 3 ] == "day," || output[ 3 ] == "days," ) {
+        days = cast<int>( output[ 2 ] );
+    }
+
+    if ( days < ERROR ) {
+        MSG_SHORT = streval( "ERROR: restarted {{{days}}} days ago!" );
+        return "red";
+    }
+    else if ( days < WARNING ) {
+        MSG_SHORT = streval( "WARNING: restarted {{{days}}} day(s) ago!" );
+        return "yellow";
+    }
+    else {
+        MSG_SHORT = streval( "OK: running since {{{days}}} days" );
+    }
+
+    return "green";
+}
+
